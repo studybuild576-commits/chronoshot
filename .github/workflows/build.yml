@@ -1,51 +1,44 @@
-# Workflow ka naam
-name: Build Chronoshot APK
+name: Build Flutter Android App
 
-# Yeh workflow kab chalega?
 on:
   push:
     branches:
       - main
+  pull_request:
 
-# Workflow ke kaam (Jobs)
 jobs:
-  build-apk:
-    # Yeh job kis machine par chalega
+  build:
     runs-on: ubuntu-latest
 
-    # Job ke kadam (Steps)
     steps:
-      # Kadam 1: Code ko machine par download karna
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Kadam 2: Java (Android ke liye zaroori) setup karna
-      - name: Set up JDK 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
 
-      # Kadam 3: Flutter SDK setup karna (Updated Step)
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2' # <<< YEH LINE BADLI GAYI HAI
-          channel: 'stable'
-          cache: true # Build ko tez karne ke liye
+          flutter-version: '3.24.0' # apna flutter version daalo
 
-      # Kadam 4: Flutter packages download karna
-      - name: Install dependencies
+      - name: Flutter pub get
         run: flutter pub get
 
-      # Kadam 5: APK build karna
-      - name: Build APK
+      - name: Create local.properties
+        run: |
+          echo "flutter.versionCode=1" >> android/local.properties
+          echo "flutter.versionName=1.0" >> android/local.properties
+
+      - name: Build APK (release)
         run: flutter build apk --release
 
-      # Kadam 6: Bani hui APK ko upload karna
-      - name: Upload APK as artifact
+      # Optional: Save artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: chronoshot-apk
+          name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-

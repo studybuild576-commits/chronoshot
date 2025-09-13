@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart;
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
@@ -12,8 +12,8 @@ import 'components/joystick.dart';
 // Game ki alag-alag states
 enum GameState { playing, gameOver }
 
-// Galti 3: HasDraggables aur TapDetector ko naye DragCallbacks aur TapCallbacks se badal diya gaya hai
-class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks, TapCallbacks {
+// Humne purane, stable input system (HasDraggables, TapDetector) ka istemal kiya hai
+class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection, TapDetector {
   late Player player;
   late Joystick joystick;
   late Joystick shootJoystick;
@@ -28,16 +28,13 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    // Game shuru hone par
     startGame();
   }
 
   void startGame() {
-    // Sab kuch reset karna
     score = 0;
     state = GameState.playing;
     
-    // Player, joystick, etc. banana
     player = Player();
     
     joystick = Joystick(
@@ -60,7 +57,7 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks
     );
 
     healthText = TextComponent(
-      text: 'Health: 3', // Shuruaat mein health 3 hogi
+      text: 'Health: 3',
       position: Vector2(40, 40),
       anchor: Anchor.topLeft,
       textRenderer: TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 24)),
@@ -94,12 +91,10 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks
       _enemySpawner.update(dt);
       scoreText.text = 'Score: $score';
       
-      // Player agar game mein hai to hi health update karo
       if(player.isMounted){
         healthText.text = 'Health: ${player.health}';
       }
 
-      // Agar player mar gaya hai to game over
       if (player.health <= 0 && player.isMounted) {
         player.removeFromParent();
         state = GameState.gameOver;
@@ -109,10 +104,8 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks
   }
 
   void showGameOver() {
-    // Game over hone par saare dushman aur components hata do
     removeWhere((component) => component is Enemy || component is Joystick);
 
-    // Game Over UI dikhana
     final gameOverText = TextComponent(
       text: 'Game Over',
       position: size / 2,
@@ -131,16 +124,13 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks
   }
 
   void reset() {
-    // Saare game over UI aur purane components hata do
     removeWhere((component) => component is TextComponent || component is Player || component is Enemy);
-    // Game dobara shuru karo
     startGame();
   }
   
   @override
-  void onTapDown(TapDownEvent event) {
-    super.onTapDown(event);
-    // Agar game over hai to tap karne par reset karo
+  void onTapDown(TapDownInfo info) {
+    super.onTapDown(info);
     if (state == GameState.gameOver) {
       reset();
     }

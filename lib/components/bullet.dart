@@ -1,6 +1,6 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/palette.dart';
+import 'package.dart';
 import 'package:flutter/material.dart';
 
 import '../game.dart';
@@ -27,7 +27,6 @@ class Bullet extends PositionComponent with HasGameRef<ChronoshotGame>, Collisio
     super.update(dt);
     position.add(direction * _speed * dt);
 
-    // Agar goli screen se bahar chali jaye to use hata do.
     if (position.x < 0 || position.x > gameRef.size.x || position.y < 0 || position.y > gameRef.size.y) {
       removeFromParent();
     }
@@ -36,10 +35,10 @@ class Bullet extends PositionComponent with HasGameRef<ChronoshotGame>, Collisio
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
-    // Agar goli dushman se takraye to dono ko hata do.
     if (other is Enemy) {
       removeFromParent();
       other.removeFromParent();
+      gameRef.score += 10; // Score badhao
     }
   }
 

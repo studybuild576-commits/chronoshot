@@ -4,14 +4,14 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: '>=3.3.4 <4.0.0' # Flutter 3.19.6 ke liye sahi SDK
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # Game Engine - Stable Version
-  flame: ^1.18.0
+  # Game Engine - Guaranteed Stable Version
+  flame: ^1.16.0
 
 dev_dependencies:
   flutter_test:

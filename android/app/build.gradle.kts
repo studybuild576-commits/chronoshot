@@ -22,14 +22,13 @@ android {
         applicationId = "com.example.chronoshot"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode.toInt()   // ✅ Int assign
-        versionName = flutter.versionName           // ✅ String assign
+        versionCode = flutter.versionCode // <-- Yahan galti hai
+        versionName = flutter.versionName // <-- Yahan galti hai
     }
 
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
-            // TODO: Apna release keystore config yahan add karo jab Play Store pe upload karna ho
         }
     }
 }

@@ -6,19 +6,21 @@ import 'package:flutter/material.dart';
 
 import 'components/player.dart';
 import 'components/enemy.dart';
-import 'components/joystick.dart';
 
+// Game ki alag-alag states
 enum GameState { playing, gameOver }
 
-class ChronoshotGame extends FlameGame with HasCollisionDetection, MultiTouchDragDetector, TapDetector {
+// Updated Flame 1.18+ Game class
+class ChronoshotGame extends FlameGame with HasCollisionDetection, TapDetector {
   late Player player;
-  late Joystick joystick;
-  late Joystick shootJoystick;
+  late JoystickComponent joystick;
+  late JoystickComponent shootJoystick;
   late TextComponent scoreText;
   late TextComponent healthText;
 
   int score = 0;
   GameState state = GameState.playing;
+
   final Timer _enemySpawner = Timer(2, repeat: true);
 
   @override
@@ -33,15 +35,15 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, MultiTouchDra
 
     player = Player();
 
-    joystick = Joystick(
+    joystick = JoystickComponent(
       knob: CircleComponent(radius: 20, paint: Paint()..color = Colors.blue.withAlpha(200)),
       background: CircleComponent(radius: 50, paint: Paint()..color = Colors.blue.withAlpha(100)),
       margin: const EdgeInsets.only(left: 40, bottom: 40),
     );
 
-    shootJoystick = Joystick(
-      knob: CircleComponent(radius: 20, paint: Paint()..color = Colors.blue.withAlpha(200)),
-      background: CircleComponent(radius: 50, paint: Paint()..color = Colors.blue.withAlpha(100)),
+    shootJoystick = JoystickComponent(
+      knob: CircleComponent(radius: 20, paint: Paint()..color = Colors.red.withAlpha(200)),
+      background: CircleComponent(radius: 50, paint: Paint()..color = Colors.red.withAlpha(100)),
       margin: const EdgeInsets.only(right: 40, bottom: 40),
     );
 
@@ -54,7 +56,7 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, MultiTouchDra
 
     healthText = TextComponent(
       text: 'Health: 3',
-      position: Vector2(40, 40),
+      position: const Vector2(40, 40),
       anchor: Anchor.topLeft,
       textRenderer: TextPaint(style: const TextStyle(color: Colors.white, fontSize: 24)),
     );
@@ -72,7 +74,10 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, MultiTouchDra
   void spawnEnemy() {
     if (state == GameState.playing) {
       final random = Random();
-      final position = Vector2(random.nextDouble() * size.x, random.nextDouble() * size.y);
+      final position = Vector2(
+        random.nextDouble() * size.x,
+        random.nextDouble() * size.y,
+      );
       add(Enemy(position: position));
     }
   }
@@ -97,20 +102,20 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, MultiTouchDra
   }
 
   void showGameOver() {
-    removeWhere((component) => component is Enemy || component is Joystick);
+    removeWhere((component) => component is Enemy || component is JoystickComponent);
 
     final gameOverText = TextComponent(
       text: 'Game Over',
       position: size / 2,
       anchor: Anchor.center,
-      textRenderer: TextPaint(style: const TextStyle(color: Colors.white, fontSize: 64)),
+      textRenderer: const TextPaint(style: TextStyle(color: Colors.white, fontSize: 64)),
     );
 
     final restartText = TextComponent(
       text: 'Tap to Restart',
       position: size / 2 + Vector2(0, 80),
       anchor: Anchor.center,
-      textRenderer: TextPaint(style: const TextStyle(color: Colors.white, fontSize: 32)),
+      textRenderer: const TextPaint(style: TextStyle(color: Colors.white, fontSize: 32)),
     );
 
     add(gameOverText);
@@ -123,7 +128,7 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, MultiTouchDra
   }
 
   @override
-  void onTapDown(TapDownInfo _) {
+  void onTapDown(TapDownDetails details) {
     if (state == GameState.gameOver) {
       reset();
     }

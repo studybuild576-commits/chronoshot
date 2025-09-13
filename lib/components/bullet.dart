@@ -1,21 +1,22 @@
-import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
+import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
 import '../game.dart';
 import 'enemy.dart';
 
-class Bullet extends PositionComponent
-    with HasGameRef<ChronoshotGame>, CollisionCallbacks {
-  final double _speed = 500;
+class Bullet extends PositionComponent with HasGameRef<ChronoshotGame>, CollisionCallbacks {
+  final Vector2 direction;
+  final double _speed = 600;
 
-  Bullet({required Vector2 position}) : super(position: position);
+  Bullet({required Vector2 position, required this.direction})
+      : super(position: position);
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2.all(10.0);
+    size = Vector2(10, 20);
     anchor = Anchor.center;
     add(RectangleHitbox());
   }
@@ -23,29 +24,26 @@ class Bullet extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position.add(Vector2(0, -1) * _speed * dt);
+    position.add(direction * _speed * dt);
 
-    // Remove bullet if out of screen
-    if (position.y < 0) {
+    if (position.x < 0 || position.x > gameRef.size.x || position.y < 0 || position.y > gameRef.size.y) {
       removeFromParent();
     }
+  }
 
-    // Collision check with enemies
-    final enemies = gameRef.children.whereType<Enemy>().toList();
-    for (var enemy in enemies) {
-      if (enemy.toRect().overlaps(toRect())) {
-        enemy.removeFromParent();
-        removeFromParent();
-        break;
-      }
+  @override
+  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollisionStart(intersectionPoints, other);
+    if (other is Enemy) {
+      removeFromParent();
+      other.removeFromParent();
+      gameRef.score += 10;
     }
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    canvas.drawRect(size.toRect(), BasicPalette.yellow.paint());
+    canvas.drawRect(size.toRect(), BasicPalette.green.paint());
   }
-
-  Rect toRect() => Rect.fromLTWH(position.x, position.y, size.x, size.y);
 }

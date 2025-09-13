@@ -1,26 +1,24 @@
 name: chronoshot
 description: A new Flutter project.
-publish_to: 'none'
-
-# App version
+publish_to: 'none' 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  # Game Engine - use a stable recent release compatible with Flutter 3.24
+  # Game Engine - Stable Version
   flame: ^1.17.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # Lints - use the latest recommended
-  flutter_lints: ^4.0.0
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
+

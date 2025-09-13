@@ -1,7 +1,9 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package.dart';
+import 'package:flame/palette.dart'; // Galti 2: Yeh import miss ho gaya tha
 import 'package:flutter/material.dart';
+
+// Galti 1: 'package.dart' wala galat import hata diya gaya hai
 
 import '../game.dart';
 import 'enemy.dart';

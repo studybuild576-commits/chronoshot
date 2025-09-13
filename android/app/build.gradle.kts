@@ -22,8 +22,8 @@ android {
         applicationId = "com.example.chronoshot"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode // <-- Yahan galti hai
-        versionName = flutter.versionName // <-- Yahan galti hai
+        versionCode(flutter.versionCode.toInt())   // ✅ FIXED
+        versionName(flutter.versionName)           // ✅ FIXED
     }
 
     buildTypes {

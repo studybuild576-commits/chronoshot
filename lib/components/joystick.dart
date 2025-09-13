@@ -1,9 +1,8 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
-import 'package:flame/game.dart';
 
-class Joystick extends Component with DragCallbacks, HasGameReference {
+class Joystick extends Component with DragCallbacks, HasGameRef {
   final Paint backgroundPaint;
   final Paint knobPaint;
   final double knobRadius;
@@ -18,32 +17,28 @@ class Joystick extends Component with DragCallbacks, HasGameReference {
   Vector2 delta = Vector2.zero();
 
   Joystick({
-    required CircleComponent knob,
-    required CircleComponent background,
+    required Component knob,
+    required Component background,
     this.margin = const EdgeInsets.only(left: 40, bottom: 40),
-  })  : knobPaint = knob.paint,
-        backgroundPaint = background.paint,
-        knobRadius = knob.radius,
-        backgroundRadius = background.radius;
+  })  : knobPaint = (knob as ShapeComponent).paint,
+        backgroundPaint = (background as ShapeComponent).paint,
+        knobRadius = (knob as CircleComponent).radius,
+        backgroundRadius = (background as CircleComponent).radius;
 
   @override
   Future<void> onLoad() async {
-    final gameSize = gameRef.size;
-
     _backgroundCenter = Vector2(
       margin.left + backgroundRadius,
-      gameSize.y - margin.bottom - backgroundRadius,
+      gameRef.size.y - margin.bottom - backgroundRadius,
     );
-
     if (margin.right != 0.0) {
-      _backgroundCenter.x = gameSize.x - margin.right - backgroundRadius;
+      _backgroundCenter.x = gameRef.size.x - margin.right - backgroundRadius;
     }
 
     _backgroundRect = Rect.fromCircle(
       center: _backgroundCenter.toOffset(),
       radius: backgroundRadius,
     );
-
     _knobPosition = _backgroundCenter;
   }
 
@@ -54,25 +49,24 @@ class Joystick extends Component with DragCallbacks, HasGameReference {
   }
 
   @override
-  void onDragStart(DragStartEvent event) {
-    final local = event.localPosition.toOffset();
-    if (_backgroundRect.contains(local)) {
+  void onDragStart(DragStartInfo info) {
+    if (_backgroundRect.contains(info.eventPosition.game.toOffset())) {
       _isDragging = true;
     }
   }
 
   @override
-  void onDragUpdate(DragUpdateEvent event) {
+  void onDragUpdate(DragUpdateInfo info) {
     if (_isDragging) {
-      final local = event.localPosition;
-      delta = local - _backgroundCenter;
+      _knobPosition = info.eventPosition.game;
+      delta = _knobPosition - _backgroundCenter;
       delta.clampLength(0, backgroundRadius);
       _knobPosition = _backgroundCenter + delta;
     }
   }
 
   @override
-  void onDragEnd(DragEndEvent event) {
+  void onDragEnd(DragEndInfo info) {
     _isDragging = false;
     _knobPosition = _backgroundCenter;
     delta = Vector2.zero();

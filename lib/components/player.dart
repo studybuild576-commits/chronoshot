@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 
 import '../game.dart';
 import 'bullet.dart';
+import 'enemy.dart';
 
 // Player Component
 class Player extends PositionComponent with HasGameRef<ChronoshotGame>, CollisionCallbacks {
   final double _speed = 300;
-  final Timer _shootCooldown = Timer(0.5); // Har 0.5 second mein ek goli.
+  final Timer _shootCooldown = Timer(0.5);
+  int health = 3; // Player ki health
 
   @override
   Future<void> onLoad() async {
@@ -17,7 +19,7 @@ class Player extends PositionComponent with HasGameRef<ChronoshotGame>, Collisio
     size = Vector2.all(50.0);
     position = gameRef.size / 2;
     anchor = Anchor.center;
-    add(RectangleHitbox()); // Takkar ke liye hitbox.
+    add(RectangleHitbox());
     _shootCooldown.start();
   }
 
@@ -26,12 +28,12 @@ class Player extends PositionComponent with HasGameRef<ChronoshotGame>, Collisio
     super.update(dt);
     _shootCooldown.update(dt);
 
-    // Movement
     if (!gameRef.joystick.delta.isZero()) {
       position.add(gameRef.joystick.delta.normalized() * _speed * dt);
+      // Player ko screen ke andar rakhne ka logic
+      position.clamp(Vector2.zero() + size / 2, gameRef.size - size / 2);
     }
 
-    // Shooting
     if (!gameRef.shootJoystick.delta.isZero() && _shootCooldown.finished) {
       shoot();
       _shootCooldown.start();
@@ -45,6 +47,19 @@ class Player extends PositionComponent with HasGameRef<ChronoshotGame>, Collisio
       direction: direction,
     );
     parent?.add(bullet);
+  }
+
+  @override
+  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollisionStart(intersectionPoints, other);
+    // Agar player dushman se takraye
+    if (other is Enemy) {
+      health--; // Health kam karo
+      other.removeFromParent(); // Dushman ko hata do
+      if (health <= 0) {
+        removeFromParent(); // Player ko hata do agar health 0 hai
+      }
+    }
   }
 
   @override

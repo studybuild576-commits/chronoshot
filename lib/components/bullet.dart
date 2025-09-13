@@ -2,16 +2,14 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
-
 import '../game.dart';
 import 'enemy.dart';
 
-class Bullet extends PositionComponent with HasGameRef<ChronoshotGame>, CollisionCallbacks {
+// HasGameRef ko naye HasGameReference se badal diya gaya hai
+class Bullet extends PositionComponent with HasGameReference<ChronoshotGame>, CollisionCallbacks {
   final Vector2 direction;
   final double _speed = 600;
-
-  Bullet({required Vector2 position, required this.direction})
-      : super(position: position);
+  Bullet({required Vector2 position, required this.direction}) : super(position: position);
 
   @override
   Future<void> onLoad() async {
@@ -25,8 +23,8 @@ class Bullet extends PositionComponent with HasGameRef<ChronoshotGame>, Collisio
   void update(double dt) {
     super.update(dt);
     position.add(direction * _speed * dt);
-
-    if (position.x < 0 || position.x > gameRef.size.x || position.y < 0 || position.y > gameRef.size.y) {
+    // gameRef ko naye 'game' se badal diya gaya hai
+    if (position.x < 0 || position.x > game.size.x || position.y < 0 || position.y > game.size.y) {
       removeFromParent();
     }
   }
@@ -37,7 +35,8 @@ class Bullet extends PositionComponent with HasGameRef<ChronoshotGame>, Collisio
     if (other is Enemy) {
       removeFromParent();
       other.removeFromParent();
-      gameRef.score += 10;
+      // gameRef ko naye 'game' se badal diya gaya hai
+      game.score += 10;
     }
   }
 

@@ -11,8 +11,8 @@ import 'components/joystick.dart';
 
 enum GameState { playing, gameOver }
 
-// HasDraggables aur TapDetector ko naye DragCallbacks aur TapCallbacks se badal diya gaya hai
-class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks, TapCallbacks {
+// Humne purane, stable input system (HasDraggables, TapDetector) ka istemal kiya hai
+class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection, TapDetector {
   late Player player;
   late Joystick joystick;
   late Joystick shootJoystick;
@@ -127,10 +127,10 @@ class ChronoshotGame extends FlameGame with HasCollisionDetection, DragCallbacks
     startGame();
   }
   
-  // TapDownInfo ko naye TapDownEvent se badal diya gaya hai
+  // TapDownEvent ko purane, sahi TapDownInfo se badal diya gaya hai
   @override
-  void onTapDown(TapDownEvent event) {
-    super.onTapDown(event);
+  void onTapDown(TapDownInfo info) {
+    super.onTapDown(info);
     if (state == GameState.gameOver) {
       reset();
     }

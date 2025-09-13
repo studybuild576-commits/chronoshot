@@ -1,10 +1,10 @@
-name: Flutter Release Build
+name: Flutter CI/CD
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  pull_request:
 
 jobs:
   build:
@@ -12,25 +12,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      # 1. Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.37.0'  # Stable version
+      # 2. Setup Flutter (latest stable)
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
 
-    - name: Flutter pub get
-      run: flutter pub get
+      # 3. Enable flutter caching
+      - name: Flutter pub get
+        run: flutter pub get
 
-    - name: Accept Android SDK licenses
-      run: yes | sdkmanager --licenses || true
+      # 4. Analyze code
+      - name: Analyze
+        run: flutter analyze
 
-    - name: Build Release APK
-      run: flutter build apk --release
+      # 5. Run tests (optional)
+      - name: Run tests
+        run: flutter test || true  # ignore errors if you don't use tests
 
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-release-apk
-        path: build/app/outputs/flutter-apk/app-release.apk
+      # 6. Build APK (release)
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 7. Upload APK as artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: chronoshot-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk

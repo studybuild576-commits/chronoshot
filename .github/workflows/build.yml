@@ -27,32 +27,25 @@ jobs:
           distribution: 'temurin'
 
       # Kadam 3: Naye aur Sahi Flutter SDK ko setup karna
+      # Hum 'beta' channel ka istemal kar rahe hain jo aapke naye project setup ko samajhta hai
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'beta' # <<< YEH SABSE ZAROORI BADLAAV HAI
+          channel: 'beta' # <<< YEH SABSE ZAROORI HISSA HAI
           cache: true     # Build ko tez karne ke liye
 
       # Kadam 4: Flutter packages download karna
       - name: Install dependencies
         run: flutter pub get
 
-      # Kadam 5: Android build.gradle ko theek karna (Automatic)
-      # Yeh command zaroori nahi hai agar aapne pichhla fix kar liya hai, par yeh ek suraksha kavach hai
-      - name: Fix Gradle syntax if needed
-        run: |
-          if [ -f "android/app/build.gradle.kts" ]; then
-            sed -i 's/versionCode = flutter.versionCode/versionCode = flutter.versionCode()/' android/app/build.gradle.kts
-            sed -i 's/versionName = flutter.versionName/versionName = flutter.versionName()/' android/app/build.gradle.kts
-          fi
-
-      # Kadam 6: APK build karna
+      # Kadam 5: APK build karna
       - name: Build APK
         run: flutter build apk --release
 
-      # Kadam 7: Bani hui APK ko upload karna
+      # Kadam 6: Bani hui APK ko upload karna
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
         with:
           name: chronoshot-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+

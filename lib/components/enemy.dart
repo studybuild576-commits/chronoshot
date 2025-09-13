@@ -4,8 +4,10 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import '../game.dart';
 
-class Enemy extends PositionComponent with HasGameRef<ChronoshotGame>, CollisionCallbacks {
+class Enemy extends PositionComponent
+    with HasGameRef<ChronoshotGame>, CollisionCallbacks {
   final double _speed = 150;
+
   Enemy({required Vector2 position}) : super(position: position);
 
   @override
@@ -19,6 +21,7 @@ class Enemy extends PositionComponent with HasGameRef<ChronoshotGame>, Collision
   @override
   void update(double dt) {
     super.update(dt);
+    // Move towards player
     if (gameRef.player.isMounted) {
       final direction = (gameRef.player.position - position).normalized();
       position.add(direction * _speed * dt);
@@ -31,4 +34,3 @@ class Enemy extends PositionComponent with HasGameRef<ChronoshotGame>, Collision
     canvas.drawRect(size.toRect(), BasicPalette.red.paint());
   }
 }
-

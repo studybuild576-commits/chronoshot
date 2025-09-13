@@ -11,8 +11,8 @@ import 'components/joystick.dart';
 
 enum GameState { playing, gameOver }
 
-// Humne purane, stable input system (HasDraggables, TapDetector) ka istemal kiya hai
-class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection, TapDetector {
+// FlameGame ke sahi mixins
+class ChronoshotGame extends FlameGame with HasCollisionDetection, HasDraggables, TapDetector {
   late Player player;
   late Joystick joystick;
   late Joystick shootJoystick;
@@ -33,9 +33,9 @@ class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection
   void startGame() {
     score = 0;
     state = GameState.playing;
-    
+
     player = Player();
-    
+
     joystick = Joystick(
       knob: CircleComponent(radius: 30, paint: BasicPalette.blue.withAlpha(200).paint()),
       background: CircleComponent(radius: 60, paint: BasicPalette.blue.withAlpha(100).paint()),
@@ -61,13 +61,13 @@ class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection
       anchor: Anchor.topLeft,
       textRenderer: TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 24)),
     );
-    
+
     add(player);
     add(joystick);
     add(shootJoystick);
     add(scoreText);
     add(healthText);
-    
+
     _enemySpawner.onTick = spawnEnemy;
     _enemySpawner.start();
   }
@@ -89,8 +89,8 @@ class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection
     if (state == GameState.playing) {
       _enemySpawner.update(dt);
       scoreText.text = 'Score: $score';
-      
-      if(player.isMounted){
+
+      if (player.isMounted) {
         healthText.text = 'Health: ${player.health}';
       }
 
@@ -111,6 +111,7 @@ class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection
       anchor: Anchor.center,
       textRenderer: TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 64)),
     );
+
     final restartText = TextComponent(
       text: 'Tap to Restart',
       position: size / 2 + Vector2(0, 80),
@@ -126,11 +127,10 @@ class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection
     removeWhere((component) => component is TextComponent || component is Player || component is Enemy);
     startGame();
   }
-  
-  // TapDownEvent ko purane, sahi TapDownInfo se badal diya gaya hai
+
+  // TapDownEvent ke liye Flame 1.18+ compatible
   @override
-  void onTapDown(TapDownInfo info) {
-    super.onTapDown(info);
+  void onTapDown(TapDownEvent event) {
     if (state == GameState.gameOver) {
       reset();
     }

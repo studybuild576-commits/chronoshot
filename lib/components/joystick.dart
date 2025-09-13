@@ -1,8 +1,10 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
+import '../game.dart';
 
-class Joystick extends Component with DragCallbacks, HasGameRef {
+// HasGameRef ko naye HasGameReference se badal diya gaya hai
+class Joystick extends Component with DragCallbacks, HasGameReference<ChronoshotGame> {
   final Paint backgroundPaint;
   final Paint knobPaint;
   final double knobRadius;
@@ -27,12 +29,14 @@ class Joystick extends Component with DragCallbacks, HasGameRef {
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
+    // gameRef ki jagah 'game' ka istemal
     _backgroundCenter = Vector2(
       margin.left + backgroundRadius,
-      gameRef.size.y - margin.bottom - backgroundRadius,
+      game.size.y - margin.bottom - backgroundRadius,
     );
     if (margin.right != 0.0) {
-      _backgroundCenter.x = gameRef.size.x - margin.right - backgroundRadius;
+      _backgroundCenter.x = game.size.x - margin.right - backgroundRadius;
     }
 
     _backgroundRect = Rect.fromCircle(
@@ -44,29 +48,37 @@ class Joystick extends Component with DragCallbacks, HasGameRef {
 
   @override
   void render(Canvas canvas) {
+    super.render(canvas);
     canvas.drawCircle(_backgroundCenter.toOffset(), backgroundRadius, backgroundPaint);
     canvas.drawCircle(_knobPosition.toOffset(), knobRadius, knobPaint);
   }
 
+  // DragStartInfo ko sahi DragStartEvent se badal diya gaya hai
   @override
-  void onDragStart(DragStartInfo info) {
-    if (_backgroundRect.contains(info.eventPosition.game.toOffset())) {
+  void onDragStart(DragStartEvent event) {
+    super.onDragStart(event); // @mustCallSuper warning theek ki gayi
+    if (_backgroundRect.contains(event.localPosition.toOffset())) {
       _isDragging = true;
     }
   }
 
+  // DragUpdateInfo ko sahi DragUpdateEvent se badal diya gaya hai
   @override
-  void onDragUpdate(DragUpdateInfo info) {
+  void onDragUpdate(DragUpdateEvent event) {
+    super.onDragUpdate(event); // @mustCallSuper warning theek ki gayi
     if (_isDragging) {
-      _knobPosition = info.eventPosition.game;
+      // eventPosition.game ko sahi event.localPosition se badal diya gaya hai
+      _knobPosition = event.localPosition;
       delta = _knobPosition - _backgroundCenter;
       delta.clampLength(0, backgroundRadius);
       _knobPosition = _backgroundCenter + delta;
     }
   }
 
+  // DragEndInfo ko sahi DragEndEvent se badal diya gaya hai
   @override
-  void onDragEnd(DragEndInfo info) {
+  void onDragEnd(DragEndEvent event) {
+    super.onDragEnd(event); // @mustCallSuper warning theek ki gayi
     _isDragging = false;
     _knobPosition = _backgroundCenter;
     delta = Vector2.zero();

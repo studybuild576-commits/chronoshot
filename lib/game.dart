@@ -11,8 +11,7 @@ import 'components/joystick.dart';
 
 enum GameState { playing, gameOver }
 
-class ChronoshotGame extends FlameGame
-    with HasDraggables, HasCollisionDetection, TapCallbacks {
+class ChronoshotGame extends FlameGame with HasDraggables, HasCollisionDetection, TapDetector {
   late Player player;
   late Joystick joystick;
   late Joystick shootJoystick;
@@ -33,22 +32,18 @@ class ChronoshotGame extends FlameGame
   void startGame() {
     score = 0;
     state = GameState.playing;
-
+    
     player = Player();
-
+    
     joystick = Joystick(
-      knob: CircleComponent(
-          radius: 30, paint: BasicPalette.blue.withAlpha(200).paint()),
-      background: CircleComponent(
-          radius: 60, paint: BasicPalette.blue.withAlpha(100).paint()),
+      knob: CircleComponent(radius: 30, paint: BasicPalette.blue.withAlpha(200).paint()),
+      background: CircleComponent(radius: 60, paint: BasicPalette.blue.withAlpha(100).paint()),
       margin: const EdgeInsets.only(left: 40, bottom: 40),
     );
 
     shootJoystick = Joystick(
-      knob: CircleComponent(
-          radius: 30, paint: BasicPalette.blue.withAlpha(200).paint()),
-      background: CircleComponent(
-          radius: 60, paint: BasicPalette.blue.withAlpha(100).paint()),
+      knob: CircleComponent(radius: 30, paint: BasicPalette.blue.withAlpha(200).paint()),
+      background: CircleComponent(radius: 60, paint: BasicPalette.blue.withAlpha(100).paint()),
       margin: const EdgeInsets.only(right: 40, bottom: 40),
     );
 
@@ -56,24 +51,22 @@ class ChronoshotGame extends FlameGame
       text: 'Score: $score',
       position: Vector2(size.x - 40, 40),
       anchor: Anchor.topRight,
-      textRenderer:
-          TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 24)),
+      textRenderer: TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 24)),
     );
 
     healthText = TextComponent(
       text: 'Health: 3',
       position: Vector2(40, 40),
       anchor: Anchor.topLeft,
-      textRenderer:
-          TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 24)),
+      textRenderer: TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 24)),
     );
-
+    
     add(player);
     add(joystick);
     add(shootJoystick);
     add(scoreText);
     add(healthText);
-
+    
     _enemySpawner.onTick = spawnEnemy;
     _enemySpawner.start();
   }
@@ -95,8 +88,8 @@ class ChronoshotGame extends FlameGame
     if (state == GameState.playing) {
       _enemySpawner.update(dt);
       scoreText.text = 'Score: $score';
-
-      if (player.isMounted) {
+      
+      if(player.isMounted){
         healthText.text = 'Health: ${player.health}';
       }
 
@@ -115,15 +108,13 @@ class ChronoshotGame extends FlameGame
       text: 'Game Over',
       position: size / 2,
       anchor: Anchor.center,
-      textRenderer:
-          TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 64)),
+      textRenderer: TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 64)),
     );
     final restartText = TextComponent(
       text: 'Tap to Restart',
       position: size / 2 + Vector2(0, 80),
       anchor: Anchor.center,
-      textRenderer:
-          TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 32)),
+      textRenderer: TextPaint(style: TextStyle(color: BasicPalette.white.color, fontSize: 32)),
     );
 
     add(gameOverText);
@@ -131,13 +122,13 @@ class ChronoshotGame extends FlameGame
   }
 
   void reset() {
-    removeWhere((component) =>
-        component is TextComponent || component is Player || component is Enemy);
+    removeWhere((component) => component is TextComponent || component is Player || component is Enemy);
     startGame();
   }
-
+  
   @override
   void onTapDown(TapDownInfo info) {
+    super.onTapDown(info);
     if (state == GameState.gameOver) {
       reset();
     }

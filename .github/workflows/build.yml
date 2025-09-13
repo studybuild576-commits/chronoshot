@@ -17,7 +17,7 @@ jobs:
       - name: Setup Flutter (old stable version)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.9'   # 👈 Purana stable version use karo
+          flutter-version: '3.24.0'   # 👈 Purana stable version use karo
           channel: 'stable'
 
       - name: Install dependencies
